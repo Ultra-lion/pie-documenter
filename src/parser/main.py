@@ -33,7 +33,7 @@ def parse_file(file_path: str) -> ast.Module:
 def node_ingester(project_dir):
     folder_name = Path(project_dir).name
 
-    db_folder = Path("databases")
+    db_folder = Path("pie-databases")
     db_folder.mkdir(exist_ok=True)
 
     graph = Graph(f"{db_folder}/{folder_name}.db")
@@ -82,7 +82,20 @@ def node_ingester(project_dir):
     print(graph.stats())
 
 
+
+def linker(project_dir):
+    folder_name = Path(project_dir).name
+    db_folder = Path("pie-databases")
+    db_folder.mkdir(exist_ok=True)
+    graph = Graph(f"{db_folder}/{folder_name}.db")
+    print(graph.stats())
+    
+    for file in traverse_project(project_dir):
+        tree = parse_file(file)
+
+
 if __name__ == "__main__":
     # node_ingester("/home/rohan/Desktop/work/tru-backend")
-    node_ingester("/home/rohan/Desktop/work/product-duties-engine")
+    # node_ingester("/home/rohan/Desktop/work/product-duties-engine")
+    linker("/home/rohan/Desktop/work/product-duties-engine")
     
