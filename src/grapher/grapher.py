@@ -18,14 +18,14 @@ def draw_graph_for_given_func(project_dir, func_name):
     folder_name = Path(project_dir).name
     db_folder = Path("pie-databases")
     db_folder.mkdir(exist_ok=True)
+    pie_graph_folder = Path(f"pie-graphs/{folder_name}")
+    pie_graph_folder.mkdir(exist_ok=True)
+
     graph = Graph(f"{db_folder}/{folder_name}.db")
     print(graph.stats())
 
 
-    g_query = graph.get_neighbors(func_name)
-
-    res_count = len(g_query)
-    
+    g_query = graph.get_neighbors(func_name)    
 
     G = nx.Graph()
     G.add_node(func_name)
@@ -34,7 +34,7 @@ def draw_graph_for_given_func(project_dir, func_name):
         G.add_edge(func_name, q['properties']['name'])
     
     nx.draw(G, with_labels=True) 
-    plt.savefig("my_graph.png", format="PNG") #
+    plt.savefig(f"{pie_graph_folder}/{func_name}_neighbors.png", format="PNG") #
 
 
     
