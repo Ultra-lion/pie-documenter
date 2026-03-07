@@ -42,7 +42,31 @@ def draw_graph_for_given_func(project_dir, func_name):
     plt.savefig(f"{pie_graph_folder}/{func_name}_neighbors.png", format="PNG") #
 
 
-    
+
+def retrieve_neighbours_of_a_node(project_dir, func_name):
+    folder_name = Path(project_dir).name
+    db_folder = Path("pie-databases")
+    db_folder.mkdir(exist_ok=True)
+    pie_graph_folder = Path(f"pie-graphs/{folder_name}")
+    pie_graph_folder.mkdir(exist_ok=True)
+
+    graph = Graph(f"{db_folder}/{folder_name}.db")
+    print(graph.stats())
+
+
+    g_query = graph.get_neighbors(func_name)  
+
+    return g_query
+
+def get_all_functions():
+    pass
+
+def get_all_classes():
+    pass
+
+def get_all_class_methods():
+    pass
+
 
 if __name__ == "__main__":
     draw_graph_for_given_func(
