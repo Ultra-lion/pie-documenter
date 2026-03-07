@@ -82,6 +82,18 @@ def node_ingester(project_dir):
     print(graph.stats())
 
 
+def get_inner_function_calls(func_node):
+    calls = []
+
+    for node in ast.walk(func_node):
+        if isinstance(node, ast.Call):
+            if isinstance(node.func, ast.Name):
+                calls.append(node.func.id)
+            elif isinstance(node.func, ast.Attribute):
+                calls.append(node.func.attr)
+    return calls
+
+
 
 def linker(project_dir):
     folder_name = Path(project_dir).name
@@ -92,6 +104,29 @@ def linker(project_dir):
     
     for file in traverse_project(project_dir):
         tree = parse_file(file)
+        for node in tree.body:
+            if isinstance(node, ast.FunctionDef):
+                parent_func_name = node.name
+                calls = get_inner_function_calls(node)
+                for call in calls:
+                    graph.upsert_edge(parent_func_name, call, "", rel_type="CALLS")
+
+            elif isinstance(node, ast.ClassDef):
+                class_name = node.name
+                for item in node.body:
+                    if isinstance(item, ast.FunctionDef):
+                        method_name = item.name
+                        
+                        graph.upsert_edge(class_name, method_name, "", rel_type="OWNS")
+
+                        calls = get_inner_function_calls(item)
+
+                        for call in calls:
+                            graph.upsert_edge(method_name, call, "", rel_type="CALLS")
+    
+    print(graph.stats())
+
+
 
 
 if __name__ == "__main__":
