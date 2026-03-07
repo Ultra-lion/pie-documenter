@@ -132,5 +132,5 @@ def linker(project_dir):
 if __name__ == "__main__":
     # node_ingester("/home/rohan/Desktop/work/tru-backend")
     # node_ingester("/home/rohan/Desktop/work/product-duties-engine")
-    linker("/home/rohan/Desktop/work/product-duties-engine")
+    # linker("/home/rohan/Desktop/work/product-duties-engine")
     
