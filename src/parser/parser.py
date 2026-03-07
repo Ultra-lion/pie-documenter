@@ -110,6 +110,7 @@ def linker(project_dir):
                 calls = get_inner_function_calls(node)
                 for call in calls:
                     graph.upsert_edge(parent_func_name, call, "", rel_type="CALLS")
+                    graph.upsert_edge(call, parent_func_name, "", rel_type="CALLED_BY")
 
             elif isinstance(node, ast.ClassDef):
                 class_name = node.name
@@ -118,11 +119,13 @@ def linker(project_dir):
                         method_name = item.name
                         
                         graph.upsert_edge(class_name, method_name, "", rel_type="OWNS")
+                        graph.upsert_edge(method_name, class_name, "", rel_type="OWNED_BY")
 
                         calls = get_inner_function_calls(item)
 
                         for call in calls:
                             graph.upsert_edge(method_name, call, "", rel_type="CALLS")
+                            graph.upsert_edge(call, method_name, "", rel_type="CALLED_BY")
     
     print(graph.stats())
 
@@ -130,7 +133,7 @@ def linker(project_dir):
 
 
 if __name__ == "__main__":
-    node_ingester("/home/rohan/Desktop/work/tru-backend")
+    # node_ingester("/home/rohan/Desktop/work/tru-backend")
     # node_ingester("/home/rohan/Desktop/work/product-duties-engine")
-    # linker("/home/rohan/Desktop/work/product-duties-engine")
+    linker("/home/rohan/Desktop/work/product-duties-engine")
     

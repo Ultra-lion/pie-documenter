@@ -25,15 +25,20 @@ def draw_graph_for_given_func(project_dir, func_name):
     print(graph.stats())
 
 
-    g_query = graph.get_neighbors(func_name)    
+    g_query = graph.get_neighbors(func_name)  
+
+    nodes_num = len(g_query)+1  
 
     G = nx.Graph()
+
     G.add_node(func_name)
     for q in g_query:
         G.add_node(q['properties']['name'])
         G.add_edge(func_name, q['properties']['name'])
-    
-    nx.draw(G, with_labels=True) 
+
+    # pos = nx.spring_layout(G)
+    plt.figure(figsize=(20, 20))
+    nx.draw(G, with_labels=True, node_size=200, font_size=10) 
     plt.savefig(f"{pie_graph_folder}/{func_name}_neighbors.png", format="PNG") #
 
 
@@ -42,5 +47,5 @@ def draw_graph_for_given_func(project_dir, func_name):
 if __name__ == "__main__":
     draw_graph_for_given_func(
         "/home/rohan/Desktop/work/product-duties-engine",
-        "normalize_hts_code_format"
+        "distribute"
     )    
