@@ -1,6 +1,11 @@
-import ast
-from pathlib import Path
-import pathspec
+import sys
+import pysqlite3
+sys.modules['sqlite3'] = pysqlite3
+
+import ast  # noqa: E402
+from pathlib import Path  # noqa: E402
+import pathspec  # noqa: E402
+from graphqlite import Graph  # noqa: E402
 
 
 def traverse_project(project_path: str):
@@ -24,18 +29,55 @@ def parse_file(file_path: str) -> ast.Module:
         return ast.parse(f.read())
 
 
-if __name__ == "__main__":
-    # tree = parse_file("/home/rohan/Desktop/work/tru-backend/apps/t86/utils.py")
-    # functions = [
-    #     node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
-    # ]
-    # print(functions)
 
-    for file in traverse_project("/home/rohan/Desktop/work/tru-backend"):
+def node_ingester(project_dir):
+    graph = Graph("graph.db")
+
+    for file in traverse_project(project_dir):
         tree = parse_file(file)
-        functions = [
-            node.name
-            for node in ast.walk(tree)
-            if isinstance(node, ast.FunctionDef)
-        ]
-        print(file, functions)
+
+        functions = []
+        classes = {}
+
+        for node in tree.body:
+            if isinstance(node, ast.FunctionDef):
+                functions.append(node.name)
+            elif isinstance(node, ast.ClassDef):
+                methods = [
+                    method.name
+                    for method in node.body
+                    if isinstance(method, ast.FunctionDef)
+                ]
+                classes[node.name] = methods
+
+        func_batch = []
+        for func_name in functions:
+            func_batch.append((func_name, {"name": func_name}, "function"))
+
+        if func_batch:
+            graph.upsert_nodes_batch(func_batch)
+            print(graph.stats())
+
+        class_batch = []
+        class_methods_batch = []
+
+        for class_name, methods in classes.items():
+            class_batch.append((class_name, {"name": class_name}, "class"))
+            for method in methods:
+                class_methods_batch.append((method, {"name": method, "class": class_name}, "method"))
+        
+        if class_batch:
+            graph.upsert_nodes_batch(class_batch)
+            print(graph.stats())
+
+        if class_methods_batch:
+            graph.upsert_nodes_batch(class_methods_batch)
+            print(graph.stats())
+        
+    print(graph.stats())
+
+
+if __name__ == "__main__":
+    # node_ingester("/home/rohan/Desktop/work/tru-backend")
+    node_ingester("/home/rohan/Desktop/work/product-duties-engine")
+    

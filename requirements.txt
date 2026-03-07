@@ -1,2 +1,4 @@
 networkx[default]
 pathspec
+graphqlite
+pysqlite3-binary
