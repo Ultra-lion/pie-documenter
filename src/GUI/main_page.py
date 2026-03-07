@@ -22,7 +22,7 @@ class App(tk.Tk):
             page_name = page.__name__
             frame = page(container,self)
             self.pages[page_name] = frame
-            frame.grid(row=0,column=0,sticky="nsew")
+            frame.grid(row=0, column=0, sticky="nsew")
         
         self.show_page("MainPage")
     
