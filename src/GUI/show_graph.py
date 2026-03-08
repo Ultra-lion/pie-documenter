@@ -93,7 +93,7 @@ class ShowGraphPage(tk.Frame):
         
         edges_info = []
         for neighbor in neighbors:
-            neighbor_name = neighbor['properties']['name']
+            neighbor_name = neighbor['name']
             G.add_node(neighbor_name)
             G.add_edge(node_name, neighbor_name)
             

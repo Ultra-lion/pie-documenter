@@ -54,9 +54,20 @@ def retrieve_neighbours_of_a_node(project_dir, func_name):
     print(graph.stats())
 
 
-    g_query = graph.get_neighbors(func_name)  
+    edges = graph.get_node_edges(func_name)  
 
-    return g_query
+    neighbors = []
+    for edge in edges:
+        neighbor = {
+            "name":edge[1],
+            "rel_type":edge[2].get("type")
+        }
+        neighbors.append(neighbor)
+
+
+
+
+    return neighbors
 
 
 def load_graph(project_dir):
@@ -87,8 +98,11 @@ def get_all_class_methods(graph, offset=0, limit=100):
 
 
 if __name__ == "__main__":
-    graph = load_graph("/home/rohan/Desktop/work/proj1")
-    sample_funcs = get_all_functions(graph)
-    sample_classes = get_all_classes(graph)
-    sample_methods = get_all_class_methods(graph)
-    print(sample_funcs)
+    retrieve_neighbours_of_a_node("/home/rohan/Desktop/work/product-duties-engine", "_line_has_conflicting_combination")
+    
+    # graph = load_graph("/home/rohan/Desktop/work/product-duties-engine")
+    
+    # sample_funcs = get_all_functions(graph)
+    # sample_classes = get_all_classes(graph)
+    # sample_methods = get_all_class_methods(graph)
+    # print(sample_funcs)
