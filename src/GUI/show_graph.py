@@ -52,9 +52,28 @@ class ShowGraphPage(tk.Frame):
         scrollbar_y.pack(side=tk.RIGHT, fill=tk.Y)
         scrollbar_x.pack(side=tk.BOTTOM, fill=tk.X)
         self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+        self.canvas.bind("<MouseWheel>", self._on_mousewheel)
+        self.canvas.bind("<Button-4>", self._on_mousewheel)
+        self.canvas.bind("<Button-5>", self._on_mousewheel)
+        self.canvas.bind("<Shift-MouseWheel>", self._on_shift_mousewheel)
+        self.canvas.bind("<Shift-Button-4>", self._on_shift_mousewheel)
+        self.canvas.bind("<Shift-Button-5>", self._on_shift_mousewheel)
 
         self.previous_page = None
 
+    def _on_mousewheel(self, event):
+        if event.num == 4 or event.delta > 0:
+            self.canvas.yview_scroll(-1, "units")
+        elif event.num == 5 or event.delta < 0:
+            self.canvas.yview_scroll(1, "units")
+    
+    def _on_shift_mousewheel(self, event):
+        if event.num == 4 or event.delta > 0:
+            self.canvas.xview_scroll(-1, "units")
+        elif event.num == 5 or event.delta < 0:
+            self.canvas.xview_scroll(1, "units")
+    
     def go_back(self):
         if self.previous_page:
             self.controller.show_page(self.previous_page)
@@ -100,16 +119,22 @@ class ShowGraphPage(tk.Frame):
             rel_type = neighbor.get('rel_type', 'UNKNOWN')
             edges_info.append((node_name, neighbor_name, rel_type))
         
+        max_node_length = max(len(node) for node in G.nodes())
+        max_radius = max(25, (max_node_length * 6) + 10) + 5
+        
         pos = nx.spring_layout(G, k=2, iterations=50)
         
-        width = max(800, len(neighbors) * 50)
-        height = max(600, len(neighbors) * 40)
-        self.canvas.config(scrollregion=(0, 0, width, height))
+        base_width = max(800, len(neighbors) * 50)
+        base_height = max(600, len(neighbors) * 40)
+        width = base_width + max_radius * 2
+        height = base_height + max_radius * 2
         
         scale_x = width / 2
         scale_y = height / 2
         offset_x = width / 2
         offset_y = height / 2
+        
+        node_positions = {}
         
         for (n1, n2, rel_type) in edges_info:
             x1 = pos[n1][0] * scale_x + offset_x
@@ -136,13 +161,18 @@ class ShowGraphPage(tk.Frame):
         for node in G.nodes():
             x = pos[node][0] * scale_x + offset_x
             y = pos[node][1] * scale_y + offset_y
+
+            text_width = len(node)*6
+            base_radius = max(25, text_width/2+10)
             
             if node == node_name:
                 color = "#FF5722"
-                radius = 30
+                radius = base_radius+5
             else:
                 color = "#2196F3"
-                radius = 25
+                radius = base_radius
+            
+            node_positions[node] = (x, y, radius)
             
             self.canvas.create_oval(
                 x - radius, y - radius,
@@ -159,3 +189,15 @@ class ShowGraphPage(tk.Frame):
                 fill="white",
                 width=radius * 2 - 10
             )
+        
+        all_x = [x for x, y, r in node_positions.values()]
+        all_y = [y for x, y, r in node_positions.values()]
+        all_r = [r for x, y, r in node_positions.values()]
+        max_r = max(all_r)
+        
+        min_x = min(all_x) - max_r * 2
+        max_x = max(all_x) + max_r * 2
+        min_y = min(all_y) - max_r * 2
+        max_y = max(all_y) + max_r * 2
+        
+        self.canvas.config(scrollregion=(min_x, min_y, max_x, max_y))
