@@ -81,7 +81,7 @@ def get_all_classes(graph, offset=0, limit=100):
     return classes_names
 
 def get_all_class_methods(graph, offset=0, limit=100):
-    g_methods = graph.query(f"MATCH (a:class) return a ORDER BY a.id ASC SKIP {offset} LIMIT {limit} ") 
+    g_methods = graph.query(f"MATCH (a:method) return a ORDER BY a.id ASC SKIP {offset} LIMIT {limit} ") 
     method_names = [n['a']['properties']['name'] for n in g_methods]
     return method_names
 
