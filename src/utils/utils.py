@@ -87,7 +87,7 @@ def get_all_class_methods(graph, offset=0, limit=100):
 
 
 if __name__ == "__main__":
-    graph = load_graph("/home/rohan/Desktop/work/product-duties-engine")
+    graph = load_graph("/home/rohan/Desktop/work/proj1")
     sample_funcs = get_all_functions(graph)
     sample_classes = get_all_classes(graph)
     sample_methods = get_all_class_methods(graph)
